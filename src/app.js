@@ -1,5 +1,15 @@
-const express=require("express")
+const express = require("express");
+const indexRoutes = require("./routes/index.route");
+const app = express();
 
-const app=express()
 
-module.exports=app
+
+app.set("view engine", "ejs");
+app.use(express.static("public"));
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use("/", indexRoutes);
+
+module.exports = app;
