@@ -4,13 +4,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="../public/style/style.css">
+    <title>NexBot Chat</title>
+    <link rel="stylesheet" href="/style/style.css">
 </head>
 
 <body>
-    <h1>Welcome to Frontend</h1>
-    <script src="../public/scripts/script.js"></script>
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button id="newChatBtn" class="new-chat-btn">+ New chat</button>
+                <button id="sidebarCloseBtn" class="sidebar-close" aria-label="Close sidebar">&times;</button>
+            </div>
+            <div class="chat-history-list" id="chatHistoryList">
+                <!-- Chat history will be dynamically added here -->
+            </div>
+            <div class="sidebar-footer">
+                NexBot &copy; 2024
+            </div>
+        </aside>
+        <main class="main-content">
+            <div class="main-header">
+                <button class="sidebar-toggle" id="sidebarToggleBtn">&#9776;</button>
+                NexBot
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="msg-row msg-bot">
+                    <div class="msg-avatar">🤖</div>
+                    <div>
+                        <div class="msg-content">
+                            Hi! How can I help you today?
+                        </div>
+                        <div class="msg-meta">NexBot · 12:28</div>
+                    </div>
+                </div>
+            </div>
+            <form class="chat-input-row" id="chatForm" autocomplete="off">
+                <input class="chat-input" id="chatInput" type="text" placeholder="Send a message..." required />
+                <button class="chat-send-btn" type="submit">&#9654;</button>
+            </form>
+        </main>
+    </div>
+    <script>
+        // Sidebar toggle for mobile
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+        const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
+        sidebarToggleBtn.addEventListener('click', () => {
+            sidebar.classList.add('open');
+        });
+        sidebarCloseBtn.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+        });
+
+        // Chat logic
+        const chatForm = document.getElementById('chatForm');
+        const chatInput = document.getElementById('chatInput');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatHistoryList = document.getElementById('chatHistoryList');
+        const newChatBtn = document.getElementById('newChatBtn');
+
+        let chatHistory = [];
+        let chats = [];
+        let currentChatIndex = null;
+
+        function renderHistory() {
+            chatHistoryList.innerHTML = '';
+            chats.forEach((chat, idx) => {
+                const div = document.createElement('div');
+                div.className = 'chat-history-item' + (idx === currentChatIndex ? ' active' : '');
+                div.textContent = chat.title || 'New chat';
+                div.onclick = () => {
+                    currentChatIndex = idx;
+                    renderHistory();
+                    renderChat();
+                };
+                chatHistoryList.appendChild(div);
+            });
+        }
+
+        function renderChat() {
+            chatMessages.innerHTML = '';
+            if (currentChatIndex === null || !chats[currentChatIndex] || chats[currentChatIndex].messages.length === 0) {
+                chatMessages.innerHTML = `
+                    <div class="msg-row msg-bot">
+                        <div class="msg-avatar">🤖</div>
+                        <div>
+                            <div class="msg-content">
+                                Hi! How can I help you today?
+                            </div>
+                            <div class="msg-meta">NexBot · ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            chats[currentChatIndex].messages.forEach(({role, text, time}) => {
+                const msgRow = document.createElement('div');
+                msgRow.className = 'msg-row ' + (role === 'user' ? 'msg-user' : 'msg-bot');
+                msgRow.innerHTML = `
+                    <div class="msg-avatar">${role === 'user' ? '🧑' : '🤖'}</div>
+                    <div>
+                        <div class="msg-content">${text}</div>
+                        <div class="msg-meta">${role === 'user' ? 'You' : 'NexBot'} · ${time}</div>
+                    </div>
+                `;
+                chatMessages.appendChild(msgRow);
+            });
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function addMessage(role, text) {
+            const time = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            if (currentChatIndex === null) {
+                // Start a new chat
+                chats.push({ title: '', messages: [] });
+                currentChatIndex = chats.length - 1;
+            }
+            chats[currentChatIndex].messages.push({role, text, time});
+            // Set chat title as first user message
+            if (role === 'user' && chats[currentChatIndex].messages.length === 1) {
+                chats[currentChatIndex].title = text.length > 32 ? text.slice(0, 32) + '...' : text;
+            }
+            renderHistory();
+            renderChat();
+        }
+
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const msg = chatInput.value.trim();
+            if (!msg) return;
+            addMessage('user', msg);
+            chatInput.value = '';
+            setTimeout(() => {
+                addMessage('bot', `This is an AI reply to: "${msg}"`);
+            }, 800);
+        });
+
+        newChatBtn.addEventListener('click', function() {
+            chats.push({ title: '', messages: [] });
+            currentChatIndex = chats.length - 1;
+            renderHistory();
+            renderChat();
+        });
+
+        // Start with empty chat history and welcome message
+        renderHistory();
+        renderChat();
+    </script>
 </body>
 
 </html>

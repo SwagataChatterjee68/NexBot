@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
 
 const connectToDatabase = () => {
-  mongoose
-    .connect("mongodb://localhost:27017/nexbot")
+  mongoose.connect(process.env.MONGO_URI)
     .then(() => {
       console.log("Connected to MongoDB");
     })

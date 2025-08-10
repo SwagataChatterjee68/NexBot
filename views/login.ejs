@@ -3,9 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Login | NexBot</title>
+    <link rel="stylesheet" href="/style/authForm.css">
 </head>
 <body>
-    
+    <div class="container">
+        <form class="login-form" action="/login" method="POST" autocomplete="on">
+            <h2>Sign In</h2>
+            <label for="identifier">Username or Email</label>
+            <input type="text" id="identifier" name="identifier" placeholder="Enter your username or email" required autofocus>
+            
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin: 0.5rem 0;">
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember" style="font-size: 0.95rem;">Remember me</label>
+                </div>
+                <a href="/forgot-password" style="font-size: 0.95rem; color: #6b7280; text-decoration: none;">Forgot password?</a>
+            </div>
+            
+            <button type="submit">Login</button>
+            <div class="links">
+                <span>Don't have an account? <a href="/register">Register</a></span>
+            </div>
+        </form>
+    </div>
+    <script src="/public/scripts/script.js"></script>
 </body>
 </html>
