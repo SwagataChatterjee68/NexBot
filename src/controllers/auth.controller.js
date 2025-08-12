@@ -20,11 +20,8 @@ const postRegisterController = async (req, res) => {
     password: await bcryptjs.hash(password, 10),
   });
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-  res.cookie("token", token);
-  res.json({
-    message: "User Created Successfully",
-    user,
-  });
+  
+  res.render("login");
 };
 const getLoginController = (req, res) => {
   res.render("login");
@@ -46,10 +43,8 @@ const postLoginController = async (req, res) => {
     });
   }
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-  res.json({
-    message: "User Logged In Successfully",
-    user,
-  });
+  res.cookie("token", token);
+  res.render("index");
 };
 module.exports = {
   postLoginController,

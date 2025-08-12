@@ -60,7 +60,7 @@ function renderChat() {
   ) {
     chatMessages.innerHTML = `
                     <div class="msg-row msg-bot">
-                        <div class="msg-avatar">🤖</div>
+                        <div class="msg-avatar">AI</div>
                         <div>
                             <div class="msg-content">
                                 Hi! How can I help you today?
@@ -79,7 +79,7 @@ function renderChat() {
     msgRow.className = "msg-row " + (role === "user" ? "msg-user" : "msg-bot");
     msgRow.innerHTML = `
                     <div class="msg-avatar">${
-                      role === "user" ? "🧑" : "🤖"
+                      role === "user" ? "U" : "AI"
                     }</div>
                     <div>
                         <div class="msg-content">${text}</div>
