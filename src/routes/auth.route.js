@@ -1,18 +1,18 @@
 const express = require("express");
 const {
   getLoginController,
-  getRegsiterController,
+  getRegisterController,
   postLoginController,
   postRegisterController,
+  
 } = require("../controllers/auth.controller");
 
 const router = express.Router();
 
-router.route("/register")
-  .get(getRegsiterController)
+router
+  .route("/register")
+  .get(getRegisterController)
   .post(postRegisterController);
-router.route("/login")
-    .get(getLoginController)
-    .post(postLoginController);
+router.route("/login").get(getLoginController).post(postLoginController);
 
 module.exports = router;
