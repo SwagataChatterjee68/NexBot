@@ -15,6 +15,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 app.use("/", indexRoutes);
-app.use("/",authRoutes);
+app.use("/auth",authRoutes);
 
 module.exports = app;
