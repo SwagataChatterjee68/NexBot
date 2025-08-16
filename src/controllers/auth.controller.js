@@ -1,74 +1,58 @@
 const userModel = require("../models/user.model");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
-async function getRegisterController(req, res) {
-  res.render("register");
-}
-
-async function postRegisterController(req, res) {
-  const { username, email, password } = req.body;
-
-  const isUserExists = await userModel.findOne({
-    $or: [{ username: username }, { email: email }],
-  });
-
-  if (isUserExists) {
-    return res.status(400).json({
-      message: "User already exists with this username or email",
+const registerController = async (req, res) => {
+  const {
+    fullname: { firstName, lastName },
+    email,
+    username,
+    password,
+  } = req.body;
+  const userAlreadyExsist = await userModel.findOne({ email });
+  if (userAlreadyExsist) {
+    res.status(401).json({
+      message: "User Already Exsist",
     });
   }
-
   const hashedPassword = await bcrypt.hash(password, 10);
 
   const user = await userModel.create({
-    username: username,
-    email: email,
+    fullname: {
+      firstName,
+      lastName,
+    },
+    email,
+    username,
     password: hashedPassword,
   });
-
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-
   res.cookie("token", token);
-
-  return res.redirect("/");
-}
-
-async function getLoginController(req, res) {
-  res.render("login");
-}
-
-async function postLoginController(req, res) {
-  const { identifier, password } = req.body;
-  const user = await userModel.findOne({
-    $or: [{ username: identifier }, { email: identifier }],
+  res.status(201).json({
+    message: "User Registed Successfully",
   });
-
+};
+const loginController = async (req, res) => {
+  const { email, password } = req.body;
+  const user = await userModel.findOne({ email });
   if (!user) {
-    return res.redirect("/login?error=User not found");
+    res.status(401).json({
+      message: "User Not Exsist",
+    });
   }
-
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    return res.redirect("/login?error=Invalid password");
+  const isPassword = await bcrypt.compare(password, user.password);
+  if (!isPassword) {
+    res.status(401).json({
+      message: "Unauthorised User",
+    });
   }
-
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
-
   res.cookie("token", token);
-
-  return res.redirect("/");
-}
-
-async function userLogout(req, res) {
-  res.clearCookie("token");
-  return res.redirect("/login");
-}
-
+  res.status(201).json({
+    message: "User Logged in Successfully",
+  });
+};
 module.exports = {
-  getRegisterController,
-  postRegisterController,
-  getLoginController,
-  postLoginController,
-  userLogout,
+  registerController,
+  loginController,
 };
