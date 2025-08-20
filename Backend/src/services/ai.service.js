@@ -12,4 +12,16 @@ async function generateContent(prompt) {
   return result.text;
 }
 
-module.exports = { generateContent };
+async function generateVector(prompt) {
+  const response = await ai.models.embedContent({
+    model: "gemini-embedding-001",
+    contents: prompt,
+    config: {
+      outputDimensionality: 768,
+    },
+  });
+
+  return response.embeddings;
+}
+
+module.exports = { generateContent, generateVector };
